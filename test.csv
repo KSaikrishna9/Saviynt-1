@@ -1,3 +1,25 @@
+---------Account import JSON--------------------
+
+{
+ "ImportType": "RAAS",
+ "ResponsePath": "wd:Report_Data.wd:Report_Entry",
+ "ImportMapping": {
+ "NAME": "wd:User_Name~#~char",
+ "CUSTOMPROPERTY1": "wd:Worker_Group.wd:Full_Name~#~char",
+ "CUSTOMPROPERTY4": "wd:Worker_Group.wd:Primary_Work_Email~#~char",
+ "CUSTOMPROPERTY5": "wd:Worker_Group.wd:First_Name~#~char",
+ "CUSTOMPROPERTY6": "wd:Worker_Group.wd:Last_Name~#~char",
+ "ACCOUNTID": "wd:Workday_Account.wd:ID[0].content~#~char",
+ "CUSTOMPROPERTY30": "wd:Worker_Group.wd:Currently_Active~#~char",
+ "CUSTOMPROPERTY11": "wd:Worker.wd:ID[1].content~#~char"
+ }
+}
+
+-------------------Access import list---------------------
+
+Security Group,Domain Security Policy,Business Process Security Policy, Organizational Role
+
+
 -----------------------User Import Json--------------------------------
 
 {
@@ -44,7 +66,7 @@
   "reportUrlMapping": [
     {
       "accessType": "User",
-      "url": "https://wd5-impl-services1.workday.com/ccx/service/customreport2/cambridgeassociates5/ISU_Saviynt/SAV_Users?format=simplexml"
+      "url": "https://wd5-impl-services1.workday.com/ccx/service/customreport2/xxxxxxxx/ISU_Saviynt/SAV_Users?format=simplexml"
     }]
 }
 
@@ -114,39 +136,12 @@ select distinct a.name from accounts a join user_accounts ua on a.accountkey=ua.
 (&(objectClass=group)(CN=TestAllowInteractiveLogin)),
 (&(objectClass=group)(CN=TestDenyInteractiveLogin))
 
-Name : PAM ADM Approval Email Template
-To : kkrishna@cambridgeassociates.com
-Cc :
-Subject : Approval Notification - Action Required
-Bcc :
-From : CAIGANotifications-test@saviynt.com
 -----------------------------------------------------------
-1.	Update ENT – Manager Data Public to add IMDB Power User role, including adding the role to all existing users in the cost center to the IMDB Power User role
-a.	Artifacts
-2.	Pause WSRETRY and Workday Import jobs while updates to SAV_Users Report is being made
-a.	No artifacts – just pausing/rescheduling jobs
-3.	Update to CA IGA Users having more than one role in same Single Select application report to remove Optica Research & Operating Metrics roles that are not true single select applications
-a.	Artifacts
-4.	Update to CA IGA Users vs roles for Optica Research role to add PI Security Tool role and delete CA IGA Users vs roles for Optica Research PI Security Tool report
-a.	Artifacts
+
 
 
 --------------------------------------------------------------------
 select hr.Name as 'Rule Name',hr.description 'Rule Description',hra.objectvalue from hanarule hr join hanaruleattribute hra on hr.hanarulekey=hra.hanarule where hra.conditionoraction like 'ACTN' and hr.type=2 and hra.objectname=21 and hr.name like 'CA_RBAC%'
-
-RULE NAME	RULE DESCRIPTION	OBJECTVALUE
-CA_RBAC - Location, Cost center and User Type		44,45,46,58,48,49,50,51,52
-CA_RBAC - Location, Cost center and User Type - FeedFile import		44,45,46,58,48,49,50,51,52
-CA_RBAC_Joiner_UUR		161,162,163
-CA_RBAC_Joiner_UUR_Import		161,162,163
-CA_RBAC_Mover_CostCenter_ExceptionTransferRule_Import		129,130,131
-CA_RBAC_Mover_CostCenter_Rule_Import		161,162,163
-CA_RBAC_Mover_CostCenter_Rule_UI		161,162,163
-CA_RBAC_Mover_Provision_UUR_Import		129,130,131
-CA_RBAC_Mover_Provision_UUR_UI		129,130,131
-CA_RBAC_Mover_UserType		108,109
-
-RqG9PerZTDK8d3cPWZi7
 
 select hr.Name as 'Rule Name',hr.description 'Rule Description',hra.objectvalue from hanarule hr join hanaruleattribute hra on hr.hanarulekey=hra.hanarule where hra.conditionoraction like 'ACTN' and hr.type=2 and hra.objectname=21 and hr.name like 'CA_RBAC%'
 
@@ -236,10 +231,3 @@ ORDER BY hr.Name, hra.objectvalue
 select u.username, u.displayname,u.email,e.endpointname,group_concat(r.role_name) as 'Role Names'from users u join role_user_account rua on u.userkey = rua.userkey join roles r on rua.rolekey = r.rolekey join endpoints e on r.endpointkey = e.endpointkey join accounts a on rua.accountkey=a.accountkey where a.status=1 and u.statuskey=1 and rua.accountkey in (select accountkey from accounts where endpointkey in (select distinct ek.endpointkey from endpoints ek where substring(ek.roletypeasjson,7,1)=1)) group by u.username,e.endpointname having count(*) > 1 order by u.username
 
 
-
-
-
-
-USERNAME	DISPLAYNAME	EMAIL	ENDPOINTNAME	ROLE NAMES
-gkhatri	Gaurav Khatri	gkhatri@cambridgeassociates.com	Brooklyn	Brooklyn Users,Brooklyn Users
-gkhatri	Gaurav Khatri	gkhatri@cambridgeassociates.com	Vermilion_DB	Vermilion Operations Group,Vermilion Report Preparer,Vermilion Report Quality Checker
