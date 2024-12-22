@@ -1,0 +1,76 @@
+------------Accounts Import XML-----------------
+<dataMapping>
+    <sql-query description="This is the Source Database Query">
+        <![CDATA[
+		 SELECT
+    'Oracle' AS Application,
+    'Oracle' AS endpoint,
+    ACCOUNTNAME AS USERNAME,
+      Unique Attribute AS EmployeeID,
+        STATUS AS Status,
+   "Group" AS EntitlementValue,
+        'Role' AS entitlementtype
+  FROM <DB_NAME>]]>
+    </sql-query>
+    <mapper description="This is the mapping field for Saviynt Field name" accountnotinfileaction="suspend" deleteaccountentitlement="true" addOnlyMode="FALSE" ifusernotexists="noaction" systems="'Oracle_EBS_Finesse1'">
+        <mapfield saviyntproperty="securitysystems.systemname" sourceproperty="Application" type="character"></mapfield>
+        <mapfield saviyntproperty="endpoints.endpointname" sourceproperty="endpoint" type="character"></mapfield>
+        <mapfield saviyntproperty="accounts.name" sourceproperty="USERNAME" type="character"></mapfield>
+		<mapfield saviyntproperty="accounts.accountID" sourceproperty="EmployeeID" type="number"></mapfield>
+        <mapfield saviyntproperty="accounts.status" sourceproperty="status" type="character"></mapfield>
+		<mapfield saviyntproperty="accounts.customproperty9" sourceproperty="status" type="character"></mapfield>
+        <mapfield saviyntproperty="entitlementvalues.entitlementvalue" sourceproperty="EntitlementValue" type="character"/>
+		<mapfield saviyntproperty="entitlementtypes.entitlementname" sourceproperty="entitlementtype" type="character"/>
+    </mapper>
+</dataMapping>
+------------Entitlement Import XML-----------------
+<dataMapping>
+    <sql-query description="This is the Source Database Query">
+        <![CDATA[
+		SELECT
+  'Oracle EBS' AS Application,
+  'Oracle_EBS' AS endpoint,
+  '1' AS Status,
+  "Group" AS EntitlementValue,
+  'Role' AS entitlementtype,
+  "RESP_KEY" As RESP_KEY,
+  "RESP_APP" As RESP_APP
+  FROM <DB_NAME>]]>
+    </sql-query>
+	<mapper description="This is the mapping field for Saviynt Field name" deleteentitlementowner="true" entnotpresentaction="suspend" createentitlementtype="true"> 
+        <mapfield saviyntproperty="securitysystems.systemname" sourceproperty="Application" type="character"></mapfield>
+        <mapfield saviyntproperty="endpoints.endpointname" sourceproperty="endpoint" type="character"></mapfield>
+        <mapfield saviyntproperty="entitlementvalues.entitlement_value" sourceproperty="EntitlementValue" type="character"/>
+		<mapfield saviyntproperty="entitlementtypes.entitlementname" sourceproperty="entitlementtype" type="character"/>
+		<mapfield saviyntproperty="entitlementvalues.customproperty1" sourceproperty="RESP_KEY" type="character"/>
+		<mapfield saviyntproperty="entitlementvalues.customproperty2" sourceproperty="RESP_APP" type="character"/>
+		<mapfield saviyntproperty="entitlementvalues.status" sourceproperty="status" type="number"></mapfield>
+    </mapper>
+</dataMapping>
+------------Status Threshold-----------------
+{
+"statusAndThresholdConfig": {
+"statusColumn": "customproperty9",
+"activeStatus": ["active", "Active", "ACTIVE"],
+"deleteLinks": true,
+"accountThresholdValue": 10,
+"correlateInactiveAccounts": false
+}
+}
+------------Grant Access JSON-----------------
+{
+    "Role": [
+        "INSERT INTO <DB_NAME> (ACCOUNT_NAME,EMPLOYEE_NUMBER,ROLES_RESPONSIBILITY,ROLES_END_DATE,RECORD_STATUS) VALUES('${task.accountName.toString().toUpperCase()}','${task.accountKey.accountID.toString().toUpperCase()}','${task.entitlement_valueKey.entitlement_value.toString().toUpperCase()}',SYSDATE,'N')"
+    ]
+}
+------------Delete Account Json-----------------
+{"DeleteAccountQry":["update <DB_NAME> set Status = 'INACTIVE' WHERE USERNAME = '${task.accountName}'"]}
+------------Disable Account Json-----------------
+{"DisableAccountQry":["update <DB_NAME> set Status = 1 WHERE USERNAME = '${task.accountKey.accountID}'"]}
+------------Create Account Json-----------------
+
+{
+    "CreateAccountQry": [
+        "INSERT INTO <DB_NAME> (ACCOUNT_NAME,EMPLOYEE_NUMBER,USER_STATUS) VALUES('${task.accountName.toString().toUpperCase()}','${task.accountKey.accountID.toString().toUpperCase()}','Active')"
+    ]
+}
