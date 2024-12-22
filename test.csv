@@ -1,3 +1,82 @@
+---------Account import JSON--------------------
+
+{
+ "ImportType": "RAAS",
+ "ResponsePath": "wd:Report_Data.wd:Report_Entry",
+ "ImportMapping": {
+ "NAME": "wd:User_Name~#~char",
+ "CUSTOMPROPERTY1": "wd:Worker_Group.wd:Full_Name~#~char",
+ "CUSTOMPROPERTY4": "wd:Worker_Group.wd:Primary_Work_Email~#~char",
+ "CUSTOMPROPERTY5": "wd:Worker_Group.wd:First_Name~#~char",
+ "CUSTOMPROPERTY6": "wd:Worker_Group.wd:Last_Name~#~char",
+ "ACCOUNTID": "wd:Workday_Account.wd:ID[0].content~#~char",
+ "CUSTOMPROPERTY30": "wd:Worker_Group.wd:Currently_Active~#~char",
+ "CUSTOMPROPERTY11": "wd:Worker.wd:ID[1].content~#~char"
+ }
+}
+
+-------------------Access import list---------------------
+
+Security Group,Domain Security Policy,Business Process Security Policy, Organizational Role
+
+
+-----------------------User Import Json--------------------------------
+
+{
+  "ImportType": "RAAS",
+  "ResponsePath":"wd:Report_Data.wd:Report_Entry",
+  "ImportMapping": {
+    	        "CUSTOMPROPERTY1": "wd:WORKDAY_ID~#~string",
+		"EMPLOYEEID": "wd:EMPLOYEE_ID~#~string",
+		"USERNAME": "wd:USER_NAME~#~string",
+		"DISPLAYNAME": "wd:PREFERRED_FULL_NAME~#~string",
+		"PREFEREDFIRSTNAME": "wd:PREFERRED_NAME_FIRST_NAME~#~string",
+		"FIRSTNAME": "wd:PREFERRED_NAME_FIRST_NAME~#~string",
+		"LASTNAME": "wd:LAST_NAME~#~string",
+		"COSTCENTER": "wd:COST_CENTER~#~string",
+		"LOCATION": "wd:LOCATION_NAME~#~string",
+		"STARTDATE": "wd:HIRE_DATE~#~string",
+		"TERMDATE": "wd:TERMINATION_DATE~#~string",
+		"TITLE": "wd:BUSINESS_TITLE~#~string",
+		"EMAIL": "wd:EMAIL~#~string",
+		"CUSTOMPROPERTY2": "wd:MOBILE_PHONE~#~string",
+		"PHONENUMBER": "wd:WORK_PHONE~#~string",
+		"STREET": "wd:ADDRESS_FORMATTED_LINE_1~#~string",
+		"STATE": "wd:STATE_PROVINCE~#~string",
+		"REGIONCODE": "wd:POSTAL_CODE~#~string",
+		"COUNTRY": "wd:COUNTRY_ISO_CODE~#~string",
+		"CUSTOMPROPERTY3": "wd:COUNTRY_CODE_2_DIGIT_ISO~#~string",
+		"STATUSKEY": "wd:CURRENTLY_ACTIVE~#~string",
+		"OWNER": "wd:MANAGER_USERNAME~#~string",
+		"CITY": "wd:CITY~#~string",
+		"CUSTOMPROPERTY5": "wd:PHYSICAL_DELIVERY_OFFICE_NAME~#~string",
+		"CUSTOMPROPERTY8": "wd:CONTRACT_END_DATE~#~string",
+		"CUSTOMPROPERTY4": "wd:WORKER_TYPE~#~string",
+		"EMPLOYEETYPE": "wd:EMPLOYEE_TYPE~#~string",
+		"CUSTOMPROPERTY12": "wd:NDA_DOCUMENT~#~string",
+		"CUSTOMPROPERTY13": "wd:NDA_SIGNATURE_STATUS~#~string",
+		"CUSTOMPROPERTY14": "wd:NDA_SIGNATURE_DATE~#~string",
+		"CUSTOMPROPERTY17": "wd:COST_CENTER_ID~#~string"
+     }
+}
+
+
+----------RAAS Mapping JSON-----------
+{
+  "reportUrlMapping": [
+    {
+      "accessType": "User",
+      "url": "https://wd5-impl-services1.workday.com/ccx/service/customreport2/xxxxxxxx/ISU_Saviynt/SAV_Users?format=simplexml"
+    }]
+}
+
+--------Status Key JSON--------
+{
+  "STATUS_ACTIVE": [1],
+  "STATUS_INACTIVE": [0]
+}
+
+====================================================================================
 Select e.ENDPOINTNAME as 'Application Name',et.ENTITLEMENTNAME 'Entitlement Type', evh.ENTITLEMENT_VALUE as 'Entitlement',evh.changedField as 'Attribute', evh.oldvalue as 'Old Value',evh.newvalue as 'New Value',evh.createdon as 'Changed On' , evh.requestedby as 'Changed By' from entitlement_values ev left join entitlement_values_history evh on ev.ENTITLEMENT_VALUEKEY=evh.entitlement_valuekey inner join entitlement_types et on et.ENTITLEMENTTYPEKEY=ev.ENTITLEMENTTYPEKEY inner join endpoints e on et.ENDPOINTKEY = e.ENDPOINTKEY order by evh.createdon desc;
 
 
@@ -57,39 +136,12 @@ select distinct a.name from accounts a join user_accounts ua on a.accountkey=ua.
 (&(objectClass=group)(CN=TestAllowInteractiveLogin)),
 (&(objectClass=group)(CN=TestDenyInteractiveLogin))
 
-Name : PAM ADM Approval Email Template
-To : kkrishna@cambridgeassociates.com
-Cc :
-Subject : Approval Notification - Action Required
-Bcc :
-From : CAIGANotifications-test@saviynt.com
 -----------------------------------------------------------
-1.	Update ENT – Manager Data Public to add IMDB Power User role, including adding the role to all existing users in the cost center to the IMDB Power User role
-a.	Artifacts
-2.	Pause WSRETRY and Workday Import jobs while updates to SAV_Users Report is being made
-a.	No artifacts – just pausing/rescheduling jobs
-3.	Update to CA IGA Users having more than one role in same Single Select application report to remove Optica Research & Operating Metrics roles that are not true single select applications
-a.	Artifacts
-4.	Update to CA IGA Users vs roles for Optica Research role to add PI Security Tool role and delete CA IGA Users vs roles for Optica Research PI Security Tool report
-a.	Artifacts
+
 
 
 --------------------------------------------------------------------
 select hr.Name as 'Rule Name',hr.description 'Rule Description',hra.objectvalue from hanarule hr join hanaruleattribute hra on hr.hanarulekey=hra.hanarule where hra.conditionoraction like 'ACTN' and hr.type=2 and hra.objectname=21 and hr.name like 'CA_RBAC%'
-
-RULE NAME	RULE DESCRIPTION	OBJECTVALUE
-CA_RBAC - Location, Cost center and User Type		44,45,46,58,48,49,50,51,52
-CA_RBAC - Location, Cost center and User Type - FeedFile import		44,45,46,58,48,49,50,51,52
-CA_RBAC_Joiner_UUR		161,162,163
-CA_RBAC_Joiner_UUR_Import		161,162,163
-CA_RBAC_Mover_CostCenter_ExceptionTransferRule_Import		129,130,131
-CA_RBAC_Mover_CostCenter_Rule_Import		161,162,163
-CA_RBAC_Mover_CostCenter_Rule_UI		161,162,163
-CA_RBAC_Mover_Provision_UUR_Import		129,130,131
-CA_RBAC_Mover_Provision_UUR_UI		129,130,131
-CA_RBAC_Mover_UserType		108,109
-
-RqG9PerZTDK8d3cPWZi7
 
 select hr.Name as 'Rule Name',hr.description 'Rule Description',hra.objectvalue from hanarule hr join hanaruleattribute hra on hr.hanarulekey=hra.hanarule where hra.conditionoraction like 'ACTN' and hr.type=2 and hra.objectname=21 and hr.name like 'CA_RBAC%'
 
@@ -179,10 +231,3 @@ ORDER BY hr.Name, hra.objectvalue
 select u.username, u.displayname,u.email,e.endpointname,group_concat(r.role_name) as 'Role Names'from users u join role_user_account rua on u.userkey = rua.userkey join roles r on rua.rolekey = r.rolekey join endpoints e on r.endpointkey = e.endpointkey join accounts a on rua.accountkey=a.accountkey where a.status=1 and u.statuskey=1 and rua.accountkey in (select accountkey from accounts where endpointkey in (select distinct ek.endpointkey from endpoints ek where substring(ek.roletypeasjson,7,1)=1)) group by u.username,e.endpointname having count(*) > 1 order by u.username
 
 
-
-
-
-
-USERNAME	DISPLAYNAME	EMAIL	ENDPOINTNAME	ROLE NAMES
-gkhatri	Gaurav Khatri	gkhatri@cambridgeassociates.com	Brooklyn	Brooklyn Users,Brooklyn Users
-gkhatri	Gaurav Khatri	gkhatri@cambridgeassociates.com	Vermilion_DB	Vermilion Operations Group,Vermilion Report Preparer,Vermilion Report Quality Checker
